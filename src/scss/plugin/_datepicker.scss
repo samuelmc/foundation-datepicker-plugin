@@ -1,0 +1,183 @@
+// Foundation datepicker by Samuel Moncarey
+// Licensed under MIT Open Source
+
+////
+/// @group datepicker
+////
+$datepicker-background: $body-background !default;
+
+$datepicker-font-color: $body-font-color !default;
+
+$datepicker-disabled-color: #ccc !default;
+$datepicker-disabled-background: #ddd !default;
+
+$datepicker-other-month-color: #ccc !default;
+$datepicker-other-month-background: #ddd !default;
+
+$datepicker-same-month-color: $datepicker-font-color !default;
+$datepicker-same-month-background: #bbb !default;
+
+$datepicker-today-color: $datepicker-font-color !default;
+$datepicker-today-background: #78b8e8 !default;
+
+$datepicker-current-color: $datepicker-font-color !default;
+$datepicker-current-background: $primary-color !default;
+
+/// Padding for datepicker container.
+/// @type List
+$datepicker-padding: 0 !default;
+
+/// Border for datepicker panes.
+/// @type List
+$datepicker-border: 1px solid $medium-gray !default;
+
+/// Font size for datepicker panes.
+/// @type List
+$datepicker-font-size: 1rem !default;
+
+/// Width for datepicker panes.
+/// @type Number
+$datepicker-width: rem-calc(300) !default;
+
+/// Border radius datepicker panes.
+/// @type Number
+$datepicker-radius: $global-radius !default;
+
+/// Sizes for datepicker panes. Each size is a CSS class you can apply.
+/// @type Map
+$datepicker-sizes: (
+        tiny: rem-calc(100),
+        small: rem-calc(200),
+        large: rem-calc(400),
+) !default;
+
+$datepicker-day-out: auto !default;
+$datepicker-day-in: auto !default;
+$datepicker-day-today: auto !default;
+$datepicker-day-current: $primary-color !default;
+
+/// Applies styles for a basic datepicker dropdown container.
+@mixin datepicker-container {
+  background-color: $body-background;
+  border: $datepicker-border;
+  border-radius: $datepicker-radius;
+  display: block;
+  font-size: $datepicker-font-size;
+  padding: $datepicker-padding;
+  position: absolute;
+  visibility: hidden;
+  width: $datepicker-width;
+  z-index: 10;
+
+  &.is-open {
+    visibility: visible;
+  }
+}
+
+@mixin foundation-calender-header {
+  .months-nav {
+    & > * {
+      display: block;
+    }
+    a {
+      background: $primary-color;
+      position: absolute;
+      top: 0;
+      width: 2rem;
+      margin: .25rem;
+      @if (lightness($body-background) > 50%) {
+        background: darken($body-background, 15%);
+      }
+      @else {
+        background: lighten($body-background, 15%);
+      }
+      &.calender-nav-next {
+        right: 0;
+      }
+      i {
+        display: block;
+        padding: rem-calc(9 0 7);
+      }
+    }
+    div {
+      margin: .25rem 2.5rem;
+    }
+  }
+  .weekdays {
+    padding: rem-calc(0 2);
+    @if (lightness($body-background) > 50%) {
+      background: darken($body-background, 7.5%);
+    }
+    @else {
+      background: lighten($body-background, 7.5%);
+    }
+  }
+}
+
+@mixin foundation-calender-days {
+  padding: .125rem;
+  div.column {
+    padding: .125rem;
+    .day {
+      line-height: 1.75rem;
+      display: block;
+      transition: background .4s, color .4s;
+      padding-top: rem-calc(3);
+      &.other-month {
+        color: $datepicker-other-month-color;
+        background: $datepicker-other-month-background;
+        cursor: default;
+        &:hover {
+          color: $datepicker-other-month-color;
+          background: $datepicker-other-month-background;
+        }
+      }
+      &.same-month {
+        color: $datepicker-same-month-color;
+        background: $datepicker-same-month-background;
+        &.today {
+          color: $datepicker-today-color;
+          background: $datepicker-today-background;
+          &:hover {
+            color: $datepicker-current-color;
+            background: $datepicker-current-background;
+          }
+        }
+      }
+      &.current, &:hover {
+        color: $datepicker-current-color;
+        background: $datepicker-current-background;
+      }
+    }
+  }
+}
+
+@mixin foundation-calender {
+  text-align: center;
+  line-height: 2rem;
+  color: $datepicker-font-color;
+  a {
+    color: $datepicker-font-color;
+  }
+  .calender-header {
+    @include foundation-calender-header;
+  }
+  .days {
+    @include foundation-calender-days;
+  }
+}
+
+@mixin foundation-datepicker {
+  .datepicker-container {
+    @include datepicker-container;
+    .foudation-calender {
+      @include foundation-calender;
+    }
+  }
+
+  @each $name, $size in $datepicker-sizes {
+    .datepicker-pane.#{$name} {
+      width: $size;
+    }
+  }
+}
