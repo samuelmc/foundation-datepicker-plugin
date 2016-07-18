@@ -20,6 +20,11 @@
         constructor(input, options) {
             this.$input = input;
             this.options = $.extend({}, Datepicker.defaults, this.$input.data(), options);
+            mm.updateLocale(this.options.locale, {
+                week: {dow: this.options.weekstart}
+            });
+            mm.locale(this.options.locale);
+
             this._init();
 
             Foundation.registerPlugin(this, 'Datepicker');
@@ -67,12 +72,14 @@
             });
             this.weekDaysHeader = this.buildWeekDaysheader();
             this._events();
-            this.currentMonth = mm().date(1);
+            this.currentMonth = mm().startOf('month');
+            this.selectedDate = mm();
         }
 
         buildWeekDaysheader() {
             var weekDaysHeader = '';
-            for (var i = this.options.weekstart; i < (this.options.weekstart + 7); i++) {
+            var start = this.options.weekstart;// + mm().localeData().firstDayOfWeek();
+            for (var i = start; i < (start + 7); i++) {
                 var weekday = i;
                 if (weekday > 6) weekday = weekday-7;
                 var weekdayName = mm().day(weekday).format('ddd');
@@ -111,7 +118,8 @@
 
         selectDay(e) {
             this.$input.val($(e.currentTarget).data('date'));
-            this.currentMonth = mm($(e.currentTarget).data('date'), this.options.format).date(1);
+            this.selectedDate = mm($(e.currentTarget).data('date'), this.options.format);
+            this.currentMonth = this.selectedDate.clone().startOf('month');
             this.close();
         }
 
@@ -119,11 +127,14 @@
             var days = '';
             var currentDate = mm(date.format('YYYY-MM-DD'));
             var first = mm(this.currentMonth.format('YYYY-MM-DD'));
-            first.date(1);
+
+            first.startOf('month');
             var last = first.clone();
-            last.add(1, 'month').subtract(1, 'day');
-            first.day(this.options.weekstart);
-            if (last.day() != (this.options.weekstart-1)) last.day((this.options.weekstart - 1) +7);
+            last.endOf('month');
+
+            first.startOf('week');
+            last.endOf('week');
+
             for (first; !first.isAfter(last.format('YYYY-MM-DD')); first.add(1, 'day')) {
                 var dayType = first.isSame(
                     currentDate.format('YYYY-MM-DD'), 'day')
@@ -344,6 +355,9 @@
                 this.counter = 4;
                 this.usedPositions.length = 0;
             }
+
+            this.currentMonth = this.selectedDate.clone().startOf('month');
+
             this.$element.trigger('hide.zf.datepicker', [this.$element]);
         }
 
