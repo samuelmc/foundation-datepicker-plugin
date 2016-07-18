@@ -22,11 +22,11 @@
     "bower_components"
   ],
   "dependencies": {
+    "foundation-sites": "^6.2.3",
     "mustache.js": "mustache#^2.2.1",
     "moment": "^2.14.1"
   },
   "devDependencies": {
-    "foundation-sites": "^6.2.3",
     "motion-ui": "^1.2.2"
   }
 }
