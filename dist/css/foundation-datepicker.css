@@ -17,58 +17,58 @@
   z-index: 10; }
   .datepicker-container.is-open {
     visibility: visible; }
-  .datepicker-container .foudation-calender {
+  .datepicker-container .foudation-calendar {
     text-align: center;
     line-height: 2rem;
     color: #0a0a0a; }
-    .datepicker-container .foudation-calender a {
+    .datepicker-container .foudation-calendar a {
       color: #0a0a0a; }
-    .datepicker-container .foudation-calender .calender-header .months-nav > * {
+    .datepicker-container .foudation-calendar .calendar-header .months-nav > * {
       display: block; }
-    .datepicker-container .foudation-calender .calender-header .months-nav a {
+    .datepicker-container .foudation-calendar .calendar-header .months-nav a {
       background: #2199e8;
       position: absolute;
       top: 0;
       width: 2rem;
       margin: .25rem;
       background: #d8d8d8; }
-      .datepicker-container .foudation-calender .calender-header .months-nav a.calender-nav-next {
+      .datepicker-container .foudation-calendar .calendar-header .months-nav a.calendar-nav-next {
         right: 0; }
-      .datepicker-container .foudation-calender .calender-header .months-nav a i {
+      .datepicker-container .foudation-calendar .calendar-header .months-nav a i {
         display: block;
         padding: 0.5625rem 0 0.4375rem; }
-    .datepicker-container .foudation-calender .calender-header .months-nav div {
+    .datepicker-container .foudation-calendar .calendar-header .months-nav div {
       margin: .25rem 2.5rem; }
-    .datepicker-container .foudation-calender .calender-header .weekdays {
+    .datepicker-container .foudation-calendar .calendar-header .weekdays {
       padding: 0 0.125rem;
       background: #ebebeb; }
-    .datepicker-container .foudation-calender .days {
+    .datepicker-container .foudation-calendar .days {
       padding: .125rem; }
-      .datepicker-container .foudation-calender .days div.column {
+      .datepicker-container .foudation-calendar .days div.column {
         padding: .125rem; }
-        .datepicker-container .foudation-calender .days div.column .day {
+        .datepicker-container .foudation-calendar .days div.column .day {
           line-height: 1.75rem;
           display: block;
           -webkit-transition: background .4s, color .4s;
           transition: background .4s, color .4s;
           padding-top: 0.1875rem; }
-          .datepicker-container .foudation-calender .days div.column .day.other-month {
+          .datepicker-container .foudation-calendar .days div.column .day.other-month {
             color: #ccc;
             background: #ddd;
             cursor: default; }
-            .datepicker-container .foudation-calender .days div.column .day.other-month:hover {
+            .datepicker-container .foudation-calendar .days div.column .day.other-month:hover {
               color: #ccc;
               background: #ddd; }
-          .datepicker-container .foudation-calender .days div.column .day.same-month {
+          .datepicker-container .foudation-calendar .days div.column .day.same-month {
             color: #0a0a0a;
             background: #bbb; }
-            .datepicker-container .foudation-calender .days div.column .day.same-month.today {
+            .datepicker-container .foudation-calendar .days div.column .day.same-month.today {
               color: #0a0a0a;
               background: #78b8e8; }
-              .datepicker-container .foudation-calender .days div.column .day.same-month.today:hover {
+              .datepicker-container .foudation-calendar .days div.column .day.same-month.today:hover {
                 color: #0a0a0a;
                 background: #2199e8; }
-          .datepicker-container .foudation-calender .days div.column .day.current, .datepicker-container .foudation-calender .days div.column .day:hover {
+          .datepicker-container .foudation-calendar .days div.column .day.current, .datepicker-container .foudation-calendar .days div.column .day:hover {
             color: #0a0a0a;
             background: #2199e8; }
 

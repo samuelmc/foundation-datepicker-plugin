@@ -91,28 +91,28 @@
             return weekDaysHeader;
         }
 
-        buildCalender() {
+        buildCalendar() {
             this.$element.html('');
             var date = this.$input.val() == '' ? mm() : mm(this.$input.val(), this.options.format, true);
             var monthViewModel = {
                 month: this.currentMonth.format('MMMM YYYY'),
                 weekdays: this.weekDaysHeader,
-                days: this.buildCalenderDays(date)
+                days: this.buildCalendarDays(date)
             };
 
-            var $calender = $(mu.render(this.options.calenderTemplate, monthViewModel));
+            var $calendar = $(mu.render(this.options.calendarTemplate, monthViewModel));
 
-            $calender
+            $calendar
                 .on('click', '.months-nav > a', this.navigateMonths.bind(this))
                 .on('click', '.day', this.selectDay.bind(this));
 
-            this.$element.append($calender);
+            this.$element.append($calendar);
         }
 
         navigateMonths(e) {
-            if ($(e.currentTarget).hasClass('calender-nav-next')) this.currentMonth.add(1,'month');
-            if ($(e.currentTarget).hasClass('calender-nav-previous')) this.currentMonth.subtract(1,'month');
-            this.buildCalender();
+            if ($(e.currentTarget).hasClass('calendar-nav-next')) this.currentMonth.add(1,'month');
+            if ($(e.currentTarget).hasClass('calendar-nav-previous')) this.currentMonth.subtract(1,'month');
+            this.buildCalendar();
             return false;
         }
 
@@ -123,7 +123,7 @@
             this.close();
         }
 
-        buildCalenderDays(date) {
+        buildCalendarDays(date) {
             var days = '';
             var currentDate = mm(date.format('YYYY-MM-DD'));
             var first = mm(this.currentMonth.format('YYYY-MM-DD'));
@@ -318,7 +318,7 @@
             this.$element.addClass('is-open')
                 .attr({'aria-hidden': false});
 
-            this.buildCalender();
+            this.buildCalendar();
 
             if(this.options.closeOnClick){ this._addBodyHandler(); }
 
@@ -413,15 +413,15 @@
         format: "YYYY-MM-DD",
         locale: 'en',
         weekstart: 0,
-        calenderTemplate:
-        '<div class="foudation-calender">' +
-        '<div class="calender-header">' +
+        calendarTemplate:
+        '<div class="foudation-calendar">' +
+        '<div class="calendar-header">' +
         '<div class="months-nav">' +
-        '<a class="calender-nav-previous">' +
+        '<a class="calendar-nav-previous">' +
         '<i class="fa fa-chevron-left fi-arrow-left"></i>' +
         '</a>' +
         '<div>{{month}}</div>' +
-        '<a class="calender-nav-next">' +
+        '<a class="calendar-nav-next">' +
         '<i class="fa fa-chevron-right fi-arrow-right"></i>' +
         '</a>' +
         '</div>' +
