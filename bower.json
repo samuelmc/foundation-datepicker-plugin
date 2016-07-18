@@ -7,7 +7,7 @@
   "description": "Datepicker plugin for Foundation 6 front end framework",
   "main": [
     "src/scss/foundation-datepicker.scss",
-    "dist/js/foundation.datepicker.js"
+    "src/js/foundation.datepicker.js"
   ],
   "keywords": [
     "foundation",
