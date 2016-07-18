@@ -1,6 +1,6 @@
 'use strict';
 
-!function($, m) {
+!function($, mu, mm) {
 
     /**
      * Datepicker module.
@@ -67,7 +67,7 @@
             });
             this.weekDaysHeader = this.buildWeekDaysheader();
             this._events();
-            this.currentMonth = moment().date(1);
+            this.currentMonth = mm().date(1);
         }
 
         buildWeekDaysheader() {
@@ -75,8 +75,8 @@
             for (var i = this.options.weekstart; i < (this.options.weekstart + 7); i++) {
                 var weekday = i;
                 if (weekday > 6) weekday = weekday-7;
-                var weekdayName = moment().day(weekday).format('ddd');
-                weekDaysHeader+= m.render(this.options.weekdayHeaderTemplate, {
+                var weekdayName = mm().day(weekday).format('ddd');
+                weekDaysHeader+= mu.render(this.options.weekdayHeaderTemplate, {
                     dayType: 'weekday-header',
                     day: weekdayName
                 });
@@ -86,14 +86,14 @@
 
         buildCalender() {
             this.$element.html('');
-            var date = this.$input.val() == '' ? moment() : moment(this.$input.val(), this.options.format, true);
+            var date = this.$input.val() == '' ? mm() : mm(this.$input.val(), this.options.format, true);
             var monthViewModel = {
-                month: this.currentMonth.format('MMMM'),
+                month: this.currentMonth.format('MMMM YYYY'),
                 weekdays: this.weekDaysHeader,
                 days: this.buildCalenderDays(date)
             };
 
-            var $calender = $(m.render(this.options.calenderTemplate, monthViewModel));
+            var $calender = $(mu.render(this.options.calenderTemplate, monthViewModel));
 
             $calender
                 .on('click', '.months-nav > a', this.navigateMonths.bind(this))
@@ -111,14 +111,14 @@
 
         selectDay(e) {
             this.$input.val($(e.currentTarget).data('date'));
-            this.currentMonth = moment($(e.currentTarget).data('date'), this.options.format).date(1);
+            this.currentMonth = mm($(e.currentTarget).data('date'), this.options.format).date(1);
             this.close();
         }
 
         buildCalenderDays(date) {
             var days = '';
-            var currentDate = moment(date.format('YYYY-MM-DD'));
-            var first = moment(this.currentMonth.format('YYYY-MM-DD'));
+            var currentDate = mm(date.format('YYYY-MM-DD'));
+            var first = mm(this.currentMonth.format('YYYY-MM-DD'));
             first.date(1);
             var last = first.clone();
             last.add(1, 'month').subtract(1, 'day');
@@ -129,10 +129,10 @@
                     currentDate.format('YYYY-MM-DD'), 'day')
                     ? 'current'
                     : (first.isSame(this.currentMonth.format('YYYY-MM-DD'), 'month'))
-                    ? (first.isSame(moment().format('YYYY-MM-DD'), 'day') ? 'same-month today' : 'same-month')
+                    ? (first.isSame(mm().format('YYYY-MM-DD'), 'day') ? 'same-month today' : 'same-month')
                     : 'other-month';
 
-                days+= m.render(this.options.dayTemplate, {
+                days+= mu.render(this.options.dayTemplate, {
                     dayType: dayType,
                     date: first.format(this.options.format),
                     day: first.date()
@@ -437,4 +437,4 @@
 // Window exports
     Foundation.plugin(Datepicker, 'Datepicker');
 
-}(jQuery, Mustache);
+}(jQuery, Mustache, moment);
