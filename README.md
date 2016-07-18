@@ -82,7 +82,7 @@ $(document).foundation();
 
 |Name     |Default  |Descrition|
 |---------|---------|----------|
-|datadata-v-offset|0|Number of pixels between the dropdown pane and the triggering element on open.|
+|data-v-offset|0|Number of pixels between the dropdown pane and the triggering element on open.|
 |data-h-offset|0|Number of pixels between the dropdown pane and the triggering element on open.|
 |data-position-class|top|Class applied to adjust open position. JS will test and fill this in.|
 |data-close-on-click|true|Allows a click on the body to close the dropdown.|
