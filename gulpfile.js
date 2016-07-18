@@ -1,50 +1,53 @@
-var gulp = require('gulp');
-var $    = require('gulp-load-plugins')();
-var cleanCSS = require('gulp-clean-css');
-var minifyJs = require('gulp-minify');
+var gulp        = require('gulp');
+var plugins     = require('gulp-load-plugins')();
+var minifyCss   = require('gulp-mini-css');
+var uglify      = require('uglify-js-harmony');
+var minifyJs    = require('gulp-uglify/minifier');
+var rename      = require('gulp-rename');
 
-var sassPaths = [
+var sassPaths   = [
   'bower_components/foundation-sites/scss',
   'bower_components/motion-ui/src',
   'src/scss/plugin'
 ];
 
-var minifyCSSOptions = {
-  advanced: true,
-  rebase:false,
-  keepSpecialComments: false
-};
-
 gulp.task('sass', function() {
   return gulp.src('src/scss/foundation-datepicker.scss')
-    .pipe($.sass({
+    .pipe(plugins.sass({
       includePaths: sassPaths
     })
-      .on('error', $.sass.logError))
-    .pipe($.autoprefixer({
+      .on('error', plugins.sass.logError))
+    .pipe(plugins.autoprefixer({
       browsers: [
         'last 2 versions',
         'ie >= 9',
         'Android >= 2.3'
       ]
     }))
-    .pipe(gulp.dest('dist/css/foundation-datepicker.css'));
+    .pipe(gulp.dest('dist/css'));
 });
 
 gulp.task('minify-css', function () {
   return gulp.src('dist/css/foundation-datepicker.css')
-    .pipe(cleanCSS(minifyCSSOptions))
-    .pipe(gulp.dest('dist/css/foundation-datepicker.min.css'));
+      .pipe(minifyCss({ext: '.min.css'}))
+      .pipe(gulp.dest('dist/css'));
 });
 
 gulp.task('minify-js', function () {
-  return gulp.src(['src/js/**/*.js'])
-    .pipe(minifyJs({ext:{src:'.js', min:'.min.js'}}))
-    .pipe(gulp.dest('dist/js'));
+  return gulp.src('src/js/**/*.js')
+      .pipe(minifyJs({}, uglify))
+      .pipe(rename({suffix: '.min'}))
+      .pipe(gulp.dest('dist/js'));
 });
 
-gulp.task('default', ['sass', 'concat-js'], function() {
+gulp.task('copy-js', function () {
+  return gulp.src('src/js/**/*.js')
+      .pipe(plugins.copy('dist/js', {prefix: 2}));
+});
+
+
+gulp.task('default', ['sass','minify-css','copy-js','minify-js'], function() {
   gulp.watch(['src/scss/**/*.scss'], ['sass']);
-  gulp.watch(['src/js/**/*.js'], ['minify-js']);
   gulp.watch(['dist/css/foundation-datepicker.css'], ['minify-css']);
+  gulp.watch(['src/js/**/*.js'], ['copy-js','minify-js']);
 });
