@@ -27,6 +27,7 @@
     "moment": "^2.14.1"
   },
   "devDependencies": {
-    "motion-ui": "^1.2.2"
+    "motion-ui": "^1.2.2",
+    "font-awesome": "^4.6.3"
   }
 }
