@@ -4,6 +4,8 @@
 ////
 /// @group datepicker
 ////
+
+
 $datepicker-background: $body-background !default;
 
 $datepicker-font-color: $body-font-color !default;
@@ -74,7 +76,7 @@ $datepicker-day-current: $primary-color !default;
   }
 }
 
-@mixin foundation-calender-header {
+@mixin foundation-calendar-header {
   .months-nav {
     & > * {
       display: block;
@@ -91,7 +93,7 @@ $datepicker-day-current: $primary-color !default;
       @else {
         background: lighten($body-background, 15%);
       }
-      &.calender-nav-next {
+      &.calendar-nav-next {
         right: 0;
       }
       i {
@@ -114,7 +116,7 @@ $datepicker-day-current: $primary-color !default;
   }
 }
 
-@mixin foundation-calender-days {
+@mixin foundation-calendar-days {
   padding: .125rem;
   div.column {
     padding: .125rem;
@@ -152,26 +154,26 @@ $datepicker-day-current: $primary-color !default;
   }
 }
 
-@mixin foundation-calender {
+@mixin foundation-calendar {
   text-align: center;
   line-height: 2rem;
   color: $datepicker-font-color;
   a {
     color: $datepicker-font-color;
   }
-  .calender-header {
-    @include foundation-calender-header;
+  .calendar-header {
+    @include foundation-calendar-header;
   }
   .days {
-    @include foundation-calender-days;
+    @include foundation-calendar-days;
   }
 }
 
 @mixin foundation-datepicker {
   .datepicker-container {
     @include datepicker-container;
-    .foudation-calender {
-      @include foundation-calender;
+    .foudation-calendar {
+      @include foundation-calendar;
     }
   }
 
