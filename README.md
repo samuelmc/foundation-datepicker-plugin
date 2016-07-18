@@ -7,22 +7,36 @@
 ```shell
 bower install --save foundation-datepicker-plugin
 ```
-if you are using foundation's scss with gulp, the best way add the styles is by adding it to the sass paths in your gulpfile
+Add all nessesary files to your html. This plugin only works with foundation and requires momnetjs, mustache.js and either font-awesome or foundation-icons.
+```html
+<link rel="stylesheet" type="text/css" href="bower_components/foundation-sites/dist/foundation.min.css"> 
+<link rel="stylesheet" type="text/css" href="bower_components/foundation-datepicker-plugin/dist/css/foundation-datepicker.min.css"> 
+<link rel="stylesheet" type="text/css" href="bower_components/font-awesome/css/font-awesome.min.css">
+...
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/mustache.js/mustache.min.js"></script>
+<script src="bower_components/moment/min/moment-with-locales.min.js"></script>
+<script src="bower_components/foundation-sites/dist/foundation.min.js"></script>
+<script src="bower_components/foundation-datepicker-plugin/dist/js/foundation.datepicker.min.js"></script>
+```
+
+If you are using foundation's scss with gulp, the best way add the styles is by adding it to the sass paths in your gulpfile.
 ```js
 var gulp = require('gulp');
 var $    = require('gulp-load-plugins')();
 
 var sassPaths = [
   'bower_components/foundation-sites/scss',
+  'bower_components/foundation-datepicker-plugin/src/scss/plugin',
   'bower_components/motion-ui/src',
-  'bower_components/foundation-datepicker-plugin/src/scss/plugin' // 
+  'bower_components/fontawesome/scss'
 ];
 
 gulp.task('sass', function() {
     ...
 
 ```
-and adding these settings to your _settings.scss file
+Then add these settings to your _settings.scss file for customization
 ```scss
 $datepicker-background: $body-background;
 $datepicker-font-color: $body-font-color;
@@ -54,9 +68,14 @@ $datepicker-sizes: (
 <input type="text" data-datepicker>
 ```
 
-**Advanced**
+**European format**
 ```html
 <input type="text" data-datepicker data-format="DD/MM/YYYY" data-weekstart="1">
+```
+
+Run foundation and it will automaticaly initialize all the datepickers
+```js
+$(document).foundation();
 ```
 
 **Plugin options**
