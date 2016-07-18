@@ -309,13 +309,6 @@
 
             this.buildCalender();
 
-            if(this.options.autoFocus){
-                var $focusable = Foundation.Keyboard.findFocusable(this.$element);
-                if($focusable.length){
-                    $focusable.eq(0).focus();
-                }
-            }
-
             if(this.options.closeOnClick){ this._addBodyHandler(); }
 
             /**
@@ -398,20 +391,14 @@
          */
         positionClass: '',
         /**
-         * Allow the plugin to set focus to the first focusable element within the pane, regardless of method of opening.
-         * @option
-         * @example true
-         */
-        autoFocus: false,
-        /**
          * Allows a click on the body to close the datepicker.
          * @option
          * @example false
          */
         closeOnClick: true,
-        format: "DD/MM/YYYY",
+        format: "YYYY-MM-DD",
         locale: 'en',
-        weekstart: 1,
+        weekstart: 0,
         calenderTemplate:
         '<div class="foudation-calender">' +
         '<div class="calender-header">' +
