@@ -93,7 +93,7 @@ $datepicker-day-current: $primary-color !default;
       @else {
         background: lighten($body-background, 15%);
       }
-      &.calendar-nav-next {
+      &.month-nav-next {
         right: 0;
       }
       i {
@@ -172,7 +172,7 @@ $datepicker-day-current: $primary-color !default;
 @mixin foundation-datepicker {
   .datepicker-container {
     @include datepicker-container;
-    .foudation-calendar {
+    .foundation-calendar {
       @include foundation-calendar;
     }
   }

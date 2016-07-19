@@ -14,17 +14,18 @@
         /**
          * Creates a new instance of a datepicker.
          * @class
-         * @param {jQuery} input - jQuery object to make into a datepicker.
+         * @param {jQuery} input - jQuery object to attach a datepicker to.
          * @param {Object} options - Overrides to the default plugin settings.
          */
         constructor(input, options) {
             this.$input = input;
-            this.options = $.extend({}, Datepicker.defaults, this.$input.data(), options);
-            mm.updateLocale(this.options.locale, {
-                week: {dow: this.options.weekstart}
-            });
-            mm.locale(this.options.locale);
 
+            if (!this.$input.is('input[type="text"]')) {
+                console.warn('The datepicker can only be used on an <input> element with type="text".');
+                return;
+            }
+
+            this.options = $.extend({}, Datepicker.defaults, this.$input.data(), options);
             this._init();
 
             Foundation.registerPlugin(this, 'Datepicker');
@@ -45,6 +46,11 @@
         _init() {
             var $id = Foundation.GetYoDigits(6, 'datepicker');
 
+            mm.updateLocale(this.options.locale, {
+                week: {dow: this.options.weekstart}
+            });
+            mm.locale(this.options.locale);
+
             this.$input.attr({
                 'data-toggle': $id,
                 'aria-controls': $id,
@@ -52,17 +58,13 @@
                 'data-yeti-box': $id,
                 'aria-haspopup': true,
                 'aria-expanded': false
-
             });
 
             this.options.positionClass = this.getPositionClass();
             this.counter = 4;
             this.usedPositions = [];
 
-
             this.$element = $('<div class="datepicker-container"></div>');
-            this.$input.after(this.$element);
-
             this.$element.attr({
                 'id': $id,
                 'aria-hidden': 'true',
@@ -70,6 +72,8 @@
                 'data-resize': $id,
                 'aria-labelledby': this.$input[0].id || Foundation.GetYoDigits(6, 'datepicker-input')
             });
+            this.$input.after(this.$element);
+
             this.weekDaysHeader = this.buildWeekDaysheader();
             this._events();
             this.currentMonth = mm().startOf('month');
@@ -110,8 +114,8 @@
         }
 
         navigateMonths(e) {
-            if ($(e.currentTarget).hasClass('calendar-nav-next')) this.currentMonth.add(1,'month');
-            if ($(e.currentTarget).hasClass('calendar-nav-previous')) this.currentMonth.subtract(1,'month');
+            if ($(e.currentTarget).hasClass('month-nav-next')) this.currentMonth.add(1,'month');
+            if ($(e.currentTarget).hasClass('month-nav-previous')) this.currentMonth.subtract(1,'month');
             this.buildCalendar();
             return false;
         }
@@ -414,21 +418,17 @@
         locale: 'en',
         weekstart: 0,
         calendarTemplate:
-        '<div class="foudation-calendar">' +
-        '<div class="calendar-header">' +
-        '<div class="months-nav">' +
-        '<a class="calendar-nav-previous">' +
-        '<i class="fa fa-chevron-left fi-arrow-left"></i>' +
-        '</a>' +
-        '<div>{{month}}</div>' +
-        '<a class="calendar-nav-next">' +
-        '<i class="fa fa-chevron-right fi-arrow-right"></i>' +
-        '</a>' +
-        '</div>' +
-        '<div class="weekdays row small-up-7 collapse">{{{weekdays}}}</div>' +
-        '</div>' +
-        '<div class="days row small-up-7 collapse">{{{days}}}</div>' +
-        '</div>',
+            '<div class="foundation-calendar">' +
+            '<div class="calendar-header">' +
+            '<div class="months-nav">' +
+            '<a class="month-nav-previous"><i class="fa fa-chevron-left fi-arrow-left"></i></a>' +
+            '<div>{{month}}</div>' +
+            '<a class="month-nav-next"><i class="fa fa-chevron-right fi-arrow-right"></i></a>' +
+            '</div>' +
+            '<div class="weekdays row small-up-7 collapse">{{{weekdays}}}</div>' +
+            '</div>' +
+            '<div class="days row small-up-7 collapse">{{{days}}}</div>' +
+            '</div>',
         weekdayHeaderTemplate:
             '<div class="column day {{dayType}}"><strong>{{day}}</strong></div>',
         dayTemplate:
