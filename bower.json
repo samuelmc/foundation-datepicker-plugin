@@ -1,5 +1,6 @@
 {
   "name": "foundation-datepicker-plugin",
+  "version" : "1.0.0",
   "homepage": "https://github.com/samuelmc/foundation-datepicker-plugin",
   "authors": [
     "samuelmc <samuel.moncarey1991@gmail.com>"
