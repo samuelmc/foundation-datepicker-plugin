@@ -90,6 +90,6 @@ $(document).foundation();
 |data-locale|en|Sets the language for the month- and weekday names|
 |data-weekstart|0|Starting day of the week: 0 = Sunday, 1 = Monday,  ...|
 ## Licence
-MIT
+[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
 &copy; Samuel Moncarey
