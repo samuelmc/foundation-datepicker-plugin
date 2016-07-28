@@ -10,6 +10,8 @@ $datepicker-background: $body-background !default;
 
 $datepicker-font-color: $body-font-color !default;
 
+$datepicker-nav-background: $primary-color;
+
 $datepicker-disabled-color: #ccc !default;
 $datepicker-disabled-background: #ddd !default;
 
@@ -82,7 +84,6 @@ $datepicker-day-current: $primary-color !default;
       display: block;
     }
     a {
-      background: $primary-color;
       position: absolute;
       top: 0;
       width: 2rem;
@@ -112,6 +113,16 @@ $datepicker-day-current: $primary-color !default;
     }
     @else {
       background: lighten($body-background, 7.5%);
+    }
+  }
+  .nav-datepicker {
+    display: block;
+    margin: .25rem;
+    @if (lightness($body-background) > 50%) {
+      background: darken($body-background, 15%);
+    }
+    @else {
+      background: lighten($body-background, 15%);
     }
   }
 }
@@ -154,6 +165,30 @@ $datepicker-day-current: $primary-color !default;
   }
 }
 
+@mixin foundation-timepicker {
+  padding: .125rem;
+  .column {
+    padding: .125rem;
+  }
+  .button {
+    margin: 0;
+  }
+  .timepart-options-container {
+    position: relative;
+    height: 2rem;
+    overflow: hidden;
+    .options {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      .time-option {
+        line-height: 2rem;
+        height: 2rem;
+      }
+    }
+  }
+}
+
 @mixin foundation-calendar {
   text-align: center;
   line-height: 2rem;
@@ -166,6 +201,9 @@ $datepicker-day-current: $primary-color !default;
   }
   .days {
     @include foundation-calendar-days;
+  }
+  .timepicker {
+    @include foundation-timepicker;
   }
 }
 
