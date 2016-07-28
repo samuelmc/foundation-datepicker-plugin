@@ -96,6 +96,7 @@
         }
 
         buildCalendar() {
+            this.preventFalseBodyClick = true;
             this.$element.html('');
             var date = this.$input.val() == '' ? mm() : mm(this.$input.val(), this.options.format, true);
             var monthViewModel = {
@@ -113,6 +114,70 @@
             this.$element.append($calendar);
         }
 
+        buildTimePicker() {
+            this.preventFalseBodyClick = true;
+            this.$element.html('');
+            var timeparts = ['hour', 'minute'];
+            if (this.options.meridiem) timeparts.push('meridiem');
+
+            var hours = this.buildHours();
+            var minutes = this.buildMinutes();
+            var meridiems = this.options.meridiem ? this.buildMeridien() : '';
+
+            var timepickerModel = {
+                date: this.selectedDate.format('DD MMMM YYYY'),
+                coll_count: timeparts.length,
+                timeparts: hours+minutes+meridiems,
+            };
+
+            var $timepicker = $(mu.render(this.options.timePickerTemplate, timepickerModel));
+
+            $timepicker
+                .on('click', '.nav-datepicker', this.buildCalendar.bind(this))
+                .on('click', '.hour-up:not(.disabled)', this.addHour.bind(this))
+                .on('click', '.hour-down:not(.disabled)', this.subtractHour.bind(this))
+                .on('click', '.minute-up:not(.disabled)', this.addMinute.bind(this))
+                .on('click', '.minute-down:not(.disabled)', this.subtractMinute.bind(this))
+                .on('click', '.meridiem-up:not(.disabled)', this.addMeridiem.bind(this))
+                .on('click', '.meridiem-down:not(.disabled)', this.subtractMeridiem.bind(this));
+
+            this.$element.append($timepicker);
+        }
+
+        buildHours() {
+            var hours = [];
+            if (this.options.meridiem) hours = ['11','10','09','08','07','06','05','04','03','02','01','12'];
+            else hours = ['23','22','21','20','19','18','17','16','15','14','13','12','11','10','09','08','07','06','05','04','03','02','01','00'];
+            return this.buildTimePartSelector(hours, 'hour');
+        }
+
+        buildMinutes() {
+            var minutes = [];
+            for (var i=60-this.options.minuteInterval; i>=0; i = i-this.options.minuteInterval) {
+                minutes.push(i < 10 ? '0' + i : '' + i);
+            }
+            return this.buildTimePartSelector(minutes, 'minute');
+        }
+
+        buildMeridien() {
+            return this.buildTimePartSelector(['PM','AM'], 'meridiem');
+        }
+
+        buildTimePartSelector(items, part) {
+            var _this = this;
+            var options = '';
+            $.each(items, function (index, item) {
+                options+= mu.render(_this.options.timeOptionTemplate, {
+                    option: item,
+                    timepart: part
+                });
+            });
+            return mu.render(this.options.timePartSelectorTemplate, {
+                options: options,
+                timepart: part
+            });
+        }
+
         navigateMonths(e) {
             if ($(e.currentTarget).hasClass('month-nav-next')) this.currentMonth.add(1,'month');
             if ($(e.currentTarget).hasClass('month-nav-previous')) this.currentMonth.subtract(1,'month');
@@ -124,7 +189,99 @@
             this.$input.val($(e.currentTarget).data('date'));
             this.selectedDate = mm($(e.currentTarget).data('date'), this.options.format);
             this.currentMonth = this.selectedDate.clone().startOf('month');
-            this.close();
+            if (this.options.time) this.buildTimePicker();
+            else this.close();
+        }
+
+        addHour(e) {
+            this.selectedDate.add(1, 'hours');
+            this.$input.val(this.selectedDate.format(this.options.format));
+            var $selector = $(e.target).parent();
+            $('.hour-down').removeClass('disabled');
+            var option = this.options.meridiem ? this.selectedDate.format('hh') : this.selectedDate.format('HH');
+            var $option = $selector.find('.' + option + '-hour');
+            var optionDims = Foundation.Box.GetDimensions($option);
+            var bottomOffset = (optionDims.height + optionDims.offset.top) - (optionDims.parentDims.height + optionDims.parentDims.offset.top);
+            $option.parent().animate({'bottom':bottomOffset + 'px'}, '600', 'swing');
+            if ($option.is(':first-child')) {
+                $(e.target).addClass('disabled');
+            }
+
+        }
+
+        subtractHour(e) {
+            this.selectedDate.subtract(1, 'hours');
+            this.$input.val(this.selectedDate.format(this.options.format));
+            var $selector = $(e.target).parent();
+            $('.hour-up').removeClass('disabled');
+            var option = this.options.meridiem ? this.selectedDate.format('hh') : this.selectedDate.format('HH');
+            var $option = $selector.find('.' + option + '-hour');
+            var optionDims = Foundation.Box.GetDimensions($option);
+            var bottomOffset = (optionDims.height + optionDims.offset.top) - (optionDims.parentDims.height + optionDims.parentDims.offset.top);
+            $option.parent().animate({'bottom':bottomOffset + 'px'}, '600', 'swing');
+            if ($option.is(':last-child')) {
+                $(e.target).addClass('disabled');
+            }
+        }
+
+        addMinute(e) {
+            this.selectedDate.add(this.options.minuteInterval, 'minutes');
+            this.$input.val(this.selectedDate.format(this.options.format));
+            var $selector = $(e.target).parent();
+            $('.minute-down').removeClass('disabled');
+            var option = this.selectedDate.format('mm');
+            var $option = $selector.find('.' + option + '-minute');
+            var optionDims = Foundation.Box.GetDimensions($option);
+            var bottomOffset = (optionDims.height + optionDims.offset.top) - (optionDims.parentDims.height + optionDims.parentDims.offset.top);
+            $option.parent().animate({'bottom':bottomOffset + 'px'}, '600', 'swing');
+            if ($option.is(':first-child')) {
+                $(e.target).addClass('disabled');
+            }
+        }
+
+        subtractMinute(e) {
+            this.selectedDate.subtract(this.options.minuteInterval, 'minutes');
+            this.$input.val(this.selectedDate.format(this.options.format));
+            var $selector = $(e.target).parent();
+            $('.minute-up').removeClass('disabled');
+            var option = this.selectedDate.format('mm');
+            var $option = $selector.find('.' + option + '-minute');
+            var optionDims = Foundation.Box.GetDimensions($option);
+            var bottomOffset = (optionDims.height + optionDims.offset.top) - (optionDims.parentDims.height + optionDims.parentDims.offset.top);
+            $option.parent().animate({'bottom':bottomOffset + 'px'}, '600', 'swing');
+            if ($option.is(':last-child')) {
+                $(e.target).addClass('disabled');
+            }
+        }
+
+        addMeridiem(e) {
+            this.selectedDate.add(12, 'hours');
+            this.$input.val(this.selectedDate.format(this.options.format));
+            var $selector = $(e.target).parent();
+            $('.meridiem-down').removeClass('disabled');
+            var option = this.selectedDate.format('A');
+            var $option = $selector.find('.' + option + '-meridiem');
+            var optionDims = Foundation.Box.GetDimensions($option);
+            var bottomOffset = (optionDims.height + optionDims.offset.top) - (optionDims.parentDims.height + optionDims.parentDims.offset.top);
+            $option.parent().animate({'bottom':bottomOffset + 'px'}, '600', 'swing');
+            if ($option.is(':first-child')) {
+                $(e.target).addClass('disabled');
+            }
+        }
+
+        subtractMeridiem(e) {
+            this.selectedDate.subtract(12, 'hours');
+            this.$input.val(this.selectedDate.format(this.options.format));
+            var $selector = $(e.target).parent();
+            $('.meridiem-up').removeClass('disabled');
+            var option = this.selectedDate.format('A');
+            var $option = $selector.find('.' + option + '-meridiem');
+            var optionDims = Foundation.Box.GetDimensions($option);
+            var bottomOffset = (optionDims.height + optionDims.offset.top) - (optionDims.parentDims.height + optionDims.parentDims.offset.top);
+            $option.parent().animate({'bottom':bottomOffset + 'px'}, '600', 'swing');
+            if ($option.is(':last-child')) {
+                $(e.target).addClass('disabled');
+            }
         }
 
         buildCalendarDays(date) {
@@ -298,6 +455,10 @@
                     if(_this.$element.find(e.target).length) {
                         return;
                     }
+                    if(_this.preventFalseBodyClick) {
+                        _this.preventFalseBodyClick = false;
+                        return;
+                    }
                     _this.close();
                     $body.off('click.zf.datepicker');
                 });
@@ -323,6 +484,7 @@
                 .attr({'aria-hidden': false});
 
             this.buildCalendar();
+            this.preventFalseBodyClick = false;
 
             if(this.options.closeOnClick){ this._addBodyHandler(); }
 
@@ -417,6 +579,9 @@
         format: "YYYY-MM-DD",
         locale: 'en',
         weekstart: 0,
+        time: false,
+        meridiem: false,
+        minuteInterval: 15,
         calendarTemplate:
             '<div class="foundation-calendar">' +
             '<div class="calendar-header">' +
@@ -432,10 +597,26 @@
         weekdayHeaderTemplate:
             '<div class="column day {{dayType}}"><strong>{{day}}</strong></div>',
         dayTemplate:
-            '<div class="column"><a class="day {{dayType}}" data-date="{{date}}">{{day}}</a></div>'
+            '<div class="column"><a class="day {{dayType}}" data-date="{{date}}">{{day}}</a></div>',
+        timePickerTemplate:
+            '<div class="foundation-calendar">' +
+            '<div class="calendar-header">' +
+            '<a class="nav-datepicker">{{date}}</a>' +
+            '</div>' +
+            '<div class="timepicker row small-up-{{coll_count}} collapse">{{{timeparts}}}</div>' +
+            '<a class="close-datepicker">Ok</a>' +
+            '</div>',
+        timePartSelectorTemplate:
+            '<div class="column {{timepart}}">' +
+            '<a class="button primary expanded {{timepart}}-up"><i class="fa fa-chevron-up fi-arrow-up"></i></a>' +
+            '<div class="timepart-options-container"><div class="options">{{{options}}}</div></div>' +
+            '<a class="button primary expanded {{timepart}}-down disabled"><i class="fa fa-chevron-down fi-arrow-down"></i></a>' +
+            '</div>',
+        timeOptionTemplate:
+            '<div class="time-option {{option}}-{{timepart}}">{{option}}</div>'
     };
 
-// Window exports
+    // Window exports
     Foundation.plugin(Datepicker, 'Datepicker');
 
 }(jQuery, Mustache, moment);

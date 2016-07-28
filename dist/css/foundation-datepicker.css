@@ -26,7 +26,6 @@
     .datepicker-container .foundation-calendar .calendar-header .months-nav > * {
       display: block; }
     .datepicker-container .foundation-calendar .calendar-header .months-nav a {
-      background: #2199e8;
       position: absolute;
       top: 0;
       width: 2rem;
@@ -42,6 +41,10 @@
     .datepicker-container .foundation-calendar .calendar-header .weekdays {
       padding: 0 0.125rem;
       background: #ebebeb; }
+    .datepicker-container .foundation-calendar .calendar-header .nav-datepicker {
+      display: block;
+      margin: .25rem;
+      background: #d8d8d8; }
     .datepicker-container .foundation-calendar .days {
       padding: .125rem; }
       .datepicker-container .foundation-calendar .days div.column {
@@ -71,6 +74,23 @@
           .datepicker-container .foundation-calendar .days div.column .day.current, .datepicker-container .foundation-calendar .days div.column .day:hover {
             color: #0a0a0a;
             background: #2199e8; }
+    .datepicker-container .foundation-calendar .timepicker {
+      padding: .125rem; }
+      .datepicker-container .foundation-calendar .timepicker .column {
+        padding: .125rem; }
+      .datepicker-container .foundation-calendar .timepicker .button {
+        margin: 0; }
+      .datepicker-container .foundation-calendar .timepicker .timepart-options-container {
+        position: relative;
+        height: 2rem;
+        overflow: hidden; }
+        .datepicker-container .foundation-calendar .timepicker .timepart-options-container .options {
+          position: absolute;
+          width: 100%;
+          bottom: 0; }
+          .datepicker-container .foundation-calendar .timepicker .timepart-options-container .options .time-option {
+            line-height: 2rem;
+            height: 2rem; }
 
 .datepicker-pane.tiny {
   width: 6.25rem; }
