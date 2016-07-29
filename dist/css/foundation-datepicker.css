@@ -91,6 +91,10 @@
           .datepicker-container .foundation-calendar .timepicker .timepart-options-container .options .time-option {
             line-height: 2rem;
             height: 2rem; }
+    .datepicker-container .foundation-calendar .close-datepicker {
+      display: block;
+      margin: .25rem;
+      background: #d8d8d8; }
 
 .datepicker-pane.tiny {
   width: 6.25rem; }

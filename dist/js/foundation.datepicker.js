@@ -139,7 +139,8 @@
                 .on('click', '.minute-up:not(.disabled)', this.addMinute.bind(this))
                 .on('click', '.minute-down:not(.disabled)', this.subtractMinute.bind(this))
                 .on('click', '.meridiem-up:not(.disabled)', this.addMeridiem.bind(this))
-                .on('click', '.meridiem-down:not(.disabled)', this.subtractMeridiem.bind(this));
+                .on('click', '.meridiem-down:not(.disabled)', this.subtractMeridiem.bind(this))
+                .on('click', '.close-datepicker', this.close.bind(this));
 
             this.$element.append($timepicker);
         }

@@ -205,6 +205,16 @@ $datepicker-day-current: $primary-color !default;
   .timepicker {
     @include foundation-timepicker;
   }
+  .close-datepicker {
+    display: block;
+    margin: .25rem;
+    @if (lightness($body-background) > 50%) {
+      background: darken($body-background, 15%);
+    }
+    @else {
+      background: lighten($body-background, 15%);
+    }
+  }
 }
 
 @mixin foundation-datepicker {
