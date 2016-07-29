@@ -4,6 +4,9 @@
 ## Installation
 
 **With bower:**
+
+[![Bower](https://img.shields.io/bower/v/foundation-datepicker-plugin.svg)]()
+
 ```shell
 bower install --save foundation-datepicker-plugin
 ```
