@@ -25,10 +25,7 @@
   "dependencies": {
     "foundation-sites": "^6.2.3",
     "mustache.js": "mustache#^2.2.1",
-    "moment": "^2.14.1"
-  },
-  "devDependencies": {
-    "motion-ui": "^1.2.2",
+    "moment": "^2.14.1",
     "font-awesome": "^4.6.3"
   }
 }

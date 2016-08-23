@@ -5,8 +5,8 @@
     /**
      * Datepicker module.
      * @module foundation.datepicker
+     * @requires foundation.dropdown
      * @requires foundation.util.keyboard
-     * @requires foundation.util.box
      * @requires foundation.util.triggers
      */
 
@@ -14,18 +14,18 @@
         /**
          * Creates a new instance of a datepicker.
          * @class
-         * @param {jQuery} input - jQuery object to attach a datepicker to.
+         * @param {jQuery} element - jQuery object to attach a datepicker to.
          * @param {Object} options - Overrides to the default plugin settings.
          */
-        constructor(input, options) {
-            this.$input = input;
+        constructor(element, options) {
+            this.$element = element;
 
-            if (!this.$input.is('input[type="text"]')) {
+            if (!this.$element.is('input[type="text"]')) {
                 console.warn('The datepicker can only be used on an <input> element with type="text".');
                 return;
             }
 
-            this.options = $.extend({}, Datepicker.defaults, this.$input.data(), options);
+            this.options = $.extend({}, Datepicker.defaults, this.$element.data(), options);
             this._init();
 
             Foundation.registerPlugin(this, 'Datepicker');
@@ -44,40 +44,108 @@
          * @private
          */
         _init() {
-            var $id = Foundation.GetYoDigits(6, 'datepicker');
+            var $id = Foundation.GetYoDigits(6, 'datepicker'),
+                $ddId = Foundation.GetYoDigits(6, 'datapicker-dropdown');
 
             mm.updateLocale(this.options.locale, {
                 week: {dow: this.options.weekstart}
             });
             mm.locale(this.options.locale);
 
-            this.$input.attr({
-                'data-toggle': $id,
-                'aria-controls': $id,
-                'data-is-focus': false,
-                'data-yeti-box': $id,
-                'aria-haspopup': true,
-                'aria-expanded': false
-            });
-
-            this.options.positionClass = this.getPositionClass();
-            this.counter = 4;
-            this.usedPositions = [];
-
-            this.$element = $('<div class="datepicker-container"></div>');
             this.$element.attr({
-                'id': $id,
-                'aria-hidden': 'true',
-                'data-yeti-box': $id,
-                'data-resize': $id,
-                'aria-labelledby': this.$input[0].id || Foundation.GetYoDigits(6, 'datepicker-input')
+                'data-toggle': $ddId,
             });
-            this.$input.after(this.$element);
+
+            this.$dropdown = $(`<div id="${$ddId}" class="datepicker-dropdown" data-dropdown></div>`);
+            this.$dropdown.attr({
+                'data-v-offset': 0,
+                'data-h-offset': 0,
+                'data-close-on-click': this.options.closeOnClick
+            });
+            this.$element.after(this.$dropdown);
+
+            this.$date = this.$element.val() == '' ? mm().startOf('date') : mm(this.$element.val(), this.options.format, true);
+            this.$viewData = this.$date.clone();
 
             this.weekDaysHeader = this.buildWeekDaysheader();
             this._events();
             this.currentMonth = mm().startOf('month');
             this.selectedDate = mm();
+        }
+
+        _buildCalendar() {
+            let $calandar = $('<div class="datepicker-calendar">'),
+                $nav = $(`<nav>${this.$viewDate.format('MMMM YYYY')}</nav>`),
+                $subtractButton = $('<a data-date-nav="month" data-method="subtract"><i class="fa fa-chevron-left"></i></a>'),
+                $addButton = $('<a data-date-nav="month" data-method="add"><i class="fa fa-chevron-right"></i></a>'),
+                $weekdays = $('<div class="weekdays row small-up-7 collapse">'),
+                $days = $('<div class="days row small-up-7 collapse">'),
+                $first = mm(this.$viewDate.format('YYYY-MM-DD')),
+                $last = $first.clone();
+
+            $calandar.append($nav);
+            $nav.prepend($subtractButton).append($addButton);
+
+            $calendar.append($weekdays);
+            for (let i = this.options.weekstart; i < (this.options.weekstart + 7); i++) {
+                let weekday = i;
+                if (weekday > 6) weekday = weekday-7;
+
+                let name = mm().day(weekday).format('ddd');
+                $weekdays.append($(`<div class="column">${name}</div>`));
+            }
+
+            $calendar.append($days);
+            $first.startOf('month');
+            $first.startOf('week');
+            $last.endOf('month');
+            $last.endOf('week');
+            for ($first; !$first.isAfter(last.format('YYYY-MM-DD')); $first.add(1, 'day')) {
+                let dayType = $first.isSame(
+                    this.$date.format('YYYY-MM-DD'), 'day')
+                    ? 'current'
+                    : ($first.isSame(this.$date.format('YYYY-MM-DD'), 'month'))
+                    ? ($first.isSame(mm().format('YYYY-MM-DD'), 'day') ? 'same-month today' : 'same-month')
+                    : 'other-month';
+
+                $days.append($(`<div class="column"><a class="${dayType}" data-set-date="${$first.format('YYYY-MM-DD')}">${$first.date()}</a></div>`));
+            }
+
+            this._calendarEvents();
+
+        }
+
+        _calendarEvents() {
+
+        }
+
+        buildCalendarDays(date) {
+            var days = '';
+            var currentDate = mm(date.format('YYYY-MM-DD'));
+            var first = mm(this.currentMonth.format('YYYY-MM-DD'));
+
+            first.startOf('month');
+            var last = first.clone();
+            last.endOf('month');
+
+            first.startOf('week');
+            last.endOf('week');
+
+            for (first; !first.isAfter(last.format('YYYY-MM-DD')); first.add(1, 'day')) {
+                var dayType = first.isSame(
+                    currentDate.format('YYYY-MM-DD'), 'day')
+                    ? 'current'
+                    : (first.isSame(this.currentMonth.format('YYYY-MM-DD'), 'month'))
+                    ? (first.isSame(mm().format('YYYY-MM-DD'), 'day') ? 'same-month today' : 'same-month')
+                    : 'other-month';
+
+                days+= mu.render(this.options.dayTemplate, {
+                    dayType: dayType,
+                    date: first.format(this.options.format),
+                    day: first.date()
+                });
+            }
+            return days;
         }
 
         buildWeekDaysheader() {
@@ -97,8 +165,8 @@
 
         buildCalendar() {
             this.preventFalseBodyClick = true;
-            this.$element.html('');
-            var date = this.$input.val() == '' ? mm() : mm(this.$input.val(), this.options.format, true);
+            this.$dropdown.html('');
+            var date = this.$element.val() == '' ? mm().startOf('date') : mm(this.$element.val(), this.options.format, true);
             var monthViewModel = {
                 month: this.currentMonth.format('MMMM YYYY'),
                 weekdays: this.weekDaysHeader,
@@ -111,12 +179,12 @@
                 .on('click', '.months-nav > a', this.navigateMonths.bind(this))
                 .on('click', '.day', this.selectDay.bind(this));
 
-            this.$element.append($calendar);
+            this.$dropdown.append($calendar);
         }
 
         buildTimePicker() {
             this.preventFalseBodyClick = true;
-            this.$element.html('');
+            this.$dropdown.html('');
             var timeparts = ['hour', 'minute'];
             if (this.options.meridiem) timeparts.push('meridiem');
 
@@ -142,7 +210,7 @@
                 .on('click', '.meridiem-down:not(.disabled)', this.subtractMeridiem.bind(this))
                 .on('click', '.close-datepicker', this.close.bind(this));
 
-            this.$element.append($timepicker);
+            this.$dropdown.append($timepicker);
         }
 
         buildHours() {
@@ -187,16 +255,16 @@
         }
 
         selectDay(e) {
-            this.$input.val($(e.currentTarget).data('date'));
+            this.$element.val($(e.currentTarget).data('date'));
             this.selectedDate = mm($(e.currentTarget).data('date'), this.options.format);
             this.currentMonth = this.selectedDate.clone().startOf('month');
             if (this.options.time) this.buildTimePicker();
-            else this.close();
+            else this.$dropdown.trigger('close');
         }
 
         addHour(e) {
             this.selectedDate.add(1, 'hours');
-            this.$input.val(this.selectedDate.format(this.options.format));
+            this.$element.val(this.selectedDate.format(this.options.format));
             var $selector = $(e.target).parent();
             $('.hour-down').removeClass('disabled');
             var option = this.options.meridiem ? this.selectedDate.format('hh') : this.selectedDate.format('HH');
@@ -212,7 +280,7 @@
 
         subtractHour(e) {
             this.selectedDate.subtract(1, 'hours');
-            this.$input.val(this.selectedDate.format(this.options.format));
+            this.$element.val(this.selectedDate.format(this.options.format));
             var $selector = $(e.target).parent();
             $('.hour-up').removeClass('disabled');
             var option = this.options.meridiem ? this.selectedDate.format('hh') : this.selectedDate.format('HH');
@@ -227,7 +295,7 @@
 
         addMinute(e) {
             this.selectedDate.add(this.options.minuteInterval, 'minutes');
-            this.$input.val(this.selectedDate.format(this.options.format));
+            this.$element.val(this.selectedDate.format(this.options.format));
             var $selector = $(e.target).parent();
             $('.minute-down').removeClass('disabled');
             var option = this.selectedDate.format('mm');
@@ -242,7 +310,7 @@
 
         subtractMinute(e) {
             this.selectedDate.subtract(this.options.minuteInterval, 'minutes');
-            this.$input.val(this.selectedDate.format(this.options.format));
+            this.$element.val(this.selectedDate.format(this.options.format));
             var $selector = $(e.target).parent();
             $('.minute-up').removeClass('disabled');
             var option = this.selectedDate.format('mm');
@@ -257,7 +325,7 @@
 
         addMeridiem(e) {
             this.selectedDate.add(12, 'hours');
-            this.$input.val(this.selectedDate.format(this.options.format));
+            this.$element.val(this.selectedDate.format(this.options.format));
             var $selector = $(e.target).parent();
             $('.meridiem-down').removeClass('disabled');
             var option = this.selectedDate.format('A');
@@ -272,7 +340,7 @@
 
         subtractMeridiem(e) {
             this.selectedDate.subtract(12, 'hours');
-            this.$input.val(this.selectedDate.format(this.options.format));
+            this.$element.val(this.selectedDate.format(this.options.format));
             var $selector = $(e.target).parent();
             $('.meridiem-up').removeClass('disabled');
             var option = this.selectedDate.format('A');
@@ -285,124 +353,6 @@
             }
         }
 
-        buildCalendarDays(date) {
-            var days = '';
-            var currentDate = mm(date.format('YYYY-MM-DD'));
-            var first = mm(this.currentMonth.format('YYYY-MM-DD'));
-
-            first.startOf('month');
-            var last = first.clone();
-            last.endOf('month');
-
-            first.startOf('week');
-            last.endOf('week');
-
-            for (first; !first.isAfter(last.format('YYYY-MM-DD')); first.add(1, 'day')) {
-                var dayType = first.isSame(
-                    currentDate.format('YYYY-MM-DD'), 'day')
-                    ? 'current'
-                    : (first.isSame(this.currentMonth.format('YYYY-MM-DD'), 'month'))
-                    ? (first.isSame(mm().format('YYYY-MM-DD'), 'day') ? 'same-month today' : 'same-month')
-                    : 'other-month';
-
-                days+= mu.render(this.options.dayTemplate, {
-                    dayType: dayType,
-                    date: first.format(this.options.format),
-                    day: first.date()
-                });
-            }
-            return days;
-        }
-
-        /**
-         * Helper function to determine current orientation of datepicker pane.
-         * @function
-         * @returns {String} position - string value of a position class.
-         */
-        getPositionClass() {
-            var verticalPosition = this.$input[0].className.match(/(top|left|right|bottom)/g);
-            verticalPosition = verticalPosition ? verticalPosition[0] : '';
-            var horizontalPosition = /float-(\S+)\s/.exec(this.$input[0].className);
-            horizontalPosition = horizontalPosition ? horizontalPosition[1] : '';
-            var position = horizontalPosition ? horizontalPosition + ' ' + verticalPosition : verticalPosition;
-            return position;
-        }
-
-        /**
-         * Adjusts the datepicker panes orientation by adding/removing positioning classes.
-         * @function
-         * @private
-         * @param {String} position - position class to remove.
-         */
-        _reposition(position) {
-            this.usedPositions.push(position ? position : 'bottom');
-            //default, try switching to opposite side
-            if(!position && (this.usedPositions.indexOf('top') < 0)){
-                this.$element.addClass('top');
-            }else if(position === 'top' && (this.usedPositions.indexOf('bottom') < 0)){
-                this.$element.removeClass(position);
-            }else if(position === 'left' && (this.usedPositions.indexOf('right') < 0)){
-                this.$element.removeClass(position)
-                    .addClass('right');
-            }else if(position === 'right' && (this.usedPositions.indexOf('left') < 0)){
-                this.$element.removeClass(position)
-                    .addClass('left');
-            }
-
-            //if default change didn't work, try bottom or left first
-            else if(!position && (this.usedPositions.indexOf('top') > -1) && (this.usedPositions.indexOf('left') < 0)){
-                this.$element.addClass('left');
-            }else if(position === 'top' && (this.usedPositions.indexOf('bottom') > -1) && (this.usedPositions.indexOf('left') < 0)){
-                this.$element.removeClass(position)
-                    .addClass('left');
-            }else if(position === 'left' && (this.usedPositions.indexOf('right') > -1) && (this.usedPositions.indexOf('bottom') < 0)){
-                this.$element.removeClass(position);
-            }else if(position === 'right' && (this.usedPositions.indexOf('left') > -1) && (this.usedPositions.indexOf('bottom') < 0)){
-                this.$element.removeClass(position);
-            }
-            //if nothing cleared, set to bottom
-            else{
-                this.$element.removeClass(position);
-            }
-            this.classChanged = true;
-            this.counter--;
-        }
-
-        /**
-         * Sets the position and orientation of the datepicker pane, checks for collisions.
-         * Recursively calls itself if a collision is detected, with a new position class.
-         * @function
-         * @private
-         */
-        _setPosition() {
-            if(this.$input.attr('aria-expanded') === 'false'){ return false; }
-            var position = this.getPositionClass(),
-                $eleDims = Foundation.Box.GetDimensions(this.$element),
-                $inputDims = Foundation.Box.GetDimensions(this.$input),
-                _this = this,
-                direction = (position === 'left' ? 'left' : ((position === 'right') ? 'left' : 'top')),
-                param = (direction === 'top') ? 'height' : 'width',
-                offset = (param === 'height') ? this.options.vOffset : this.options.hOffset;
-
-
-
-            if(($eleDims.width >= $eleDims.windowDims.width) || (!this.counter && !Foundation.Box.ImNotTouchingYou(this.$element))){
-                this.$element.offset(Foundation.Box.GetOffsets(this.$element, this.$input, 'center bottom', this.options.vOffset, this.options.hOffset, true)).css({
-                    'width': $eleDims.windowDims.width - (this.options.hOffset * 2),
-                    'height': 'auto'
-                });
-                this.classChanged = true;
-                return false;
-            }
-
-            this.$element.offset(Foundation.Box.GetOffsets(this.$element, this.$input, position, this.options.vOffset, this.options.hOffset));
-
-            while(!Foundation.Box.ImNotTouchingYou(this.$element, false, true) && this.counter){
-                this._reposition(position);
-                this._setPosition();
-            }
-        }
-
         /**
          * Adds event listeners to the element utilizing the triggers utility library.
          * @function
@@ -410,134 +360,31 @@
          */
         _events() {
             var _this = this;
-            this.$element.on({
-                'open.zf.trigger': this.open.bind(this),
-                'close.zf.trigger': this.close.bind(this),
-                'toggle.zf.trigger': this.toggle.bind(this),
-                'resizeme.zf.trigger': this._setPosition.bind(this)
-            });
-            this.$input.add(this.$element).on('keydown.zf.datepicker', function(e) {
+
+            this.$element.add(this.$dropdown)
+                .off('keydow.zf.dropdown')
+                .on('keydown.zf.datepicker', function(e) {
 
                 Foundation.Keyboard.handleKey(e, 'Datepicker', {
                     tab_forward: function() {
-                        _this.close();
+                        _this.$dropdown.trigger('close');
                     },
                     tab_backward: function() {
-                        _this.close();
+                        _this.$dropdown.trigger('close');
                     },
                     open: function() {
-                        if ($target.is(_this.$input)) {
-                            _this.open();
-                            _this.$element.attr('tabindex', -1).focus();
+                        if ($target.is(_this.$element)) {
+                            _this.$dropdown.trigger('open');
+                            _this.$dropdown.attr('tabindex', -1).focus();
                             e.preventDefault();
                         }
                     },
                     close: function() {
-                        _this.close();
-                        _this.$input.focus();
+                        _this.$dropdown.trigger('close');
+                        _this.$element.focus();
                     }
                 });
             });
-        }
-
-        /**
-         * Adds an event handler to the body to close any datepickers on a click.
-         * @function
-         * @private
-         */
-        _addBodyHandler() {
-            var $body = $(document.body).not(this.$element),
-                _this = this;
-            $body.off('click.zf.datepicker')
-                .on('click.zf.datepicker', function(e){
-                    if(_this.$input.is(e.target) || _this.$input.find(e.target).length) {
-                        return;
-                    }
-                    if(_this.$element.find(e.target).length) {
-                        return;
-                    }
-                    if(_this.preventFalseBodyClick) {
-                        _this.preventFalseBodyClick = false;
-                        return;
-                    }
-                    _this.close();
-                    $body.off('click.zf.datepicker');
-                });
-        }
-
-        /**
-         * Opens the datepicker pane, and fires a bubbling event to close other datepickers.
-         * @function
-         * @fires Datepicker#closeme
-         * @fires Datepicker#show
-         */
-        open() {
-            // var _this = this;
-            /**
-             * Fires to close other open datepickers
-             * @event Datepicker#closeme
-             */
-            this.$element.trigger('closeme.zf.datepicker', this.$element.attr('id'));
-            this.$input.attr({'aria-expanded': true});
-
-            this._setPosition();
-            this.$element.addClass('is-open')
-                .attr({'aria-hidden': false});
-
-            this.buildCalendar();
-            this.preventFalseBodyClick = false;
-
-            if(this.options.closeOnClick){ this._addBodyHandler(); }
-
-            /**
-             * Fires once the datepicker is visible.
-             * @event Datepicker#show
-             */
-            this.$element.trigger('show.zf.datepicker', [this.$element]);
-        }
-
-        /**
-         * Closes the open datepicker pane.
-         * @function
-         * @fires Datepicker#hide
-         */
-        close() {
-            if(!this.$element.hasClass('is-open')){
-                return false;
-            }
-            this.$element.removeClass('is-open')
-                .attr({'aria-hidden': true});
-
-            this.$input.attr('aria-expanded', false);
-
-            if(this.classChanged){
-                var curPositionClass = this.getPositionClass();
-                if(curPositionClass){
-                    this.$element.removeClass(curPositionClass);
-                }
-                this.$element
-                    .addClass(this.options.positionClass)
-                    .css({height: '', width: ''});
-                this.classChanged = false;
-                this.counter = 4;
-                this.usedPositions.length = 0;
-            }
-
-            this.currentMonth = this.selectedDate.clone().startOf('month');
-
-            this.$element.trigger('hide.zf.datepicker', [this.$element]);
-        }
-
-        /**
-         * Toggles the datepicker pane's visibility.
-         * @function
-         */
-        toggle() {
-            if(this.$element.hasClass('is-open')){
-                this.close();
-            }else{
-                this.open();
-            }
         }
 
         /**
@@ -545,8 +392,8 @@
          * @function
          */
         destroy() {
-            this.$element.off('.zf.trigger').hide();
-            this.$input.off('.zf.datepicker');
+            this.$dropdown.remove();
+            this.$element.off('.zf.datepicker');
 
             Foundation.unregisterPlugin(this);
         }
@@ -554,27 +401,9 @@
 
     Datepicker.defaults = {
         /**
-         * Number of pixels between the datepicker pane and the triggering element on open.
-         * @option
-         * @example 1
-         */
-        vOffset: 0,
-        /**
-         * Number of pixels between the datepicker pane and the triggering element on open.
-         * @option
-         * @example 1
-         */
-        hOffset: 0,
-        /**
-         * Class applied to adjust open position. JS will test and fill this in.
-         * @option
-         * @example 'top'
-         */
-        positionClass: '',
-        /**
          * Allows a click on the body to close the datepicker.
          * @option
-         * @example false
+         * @example true
          */
         closeOnClick: true,
         format: "YYYY-MM-DD",
