@@ -159,65 +159,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 if (this.options.closeOnSelect && !this.options.time) this.$dropdown.trigger('close');else if (this.options.time) this._buildCalendar();else this._buildCalendar();
             }
         }, {
-            key: 'buildCalendarDays',
-            value: function buildCalendarDays(date) {
-                var days = '';
-                var currentDate = mm(date.format('YYYY-MM-DD'));
-                var first = mm(this.currentMonth.format('YYYY-MM-DD'));
-
-                first.startOf('month');
-                var last = first.clone();
-                last.endOf('month');
-
-                first.startOf('week');
-                last.endOf('week');
-
-                for (first; !first.isAfter(last.format('YYYY-MM-DD')); first.add(1, 'day')) {
-                    var dayType = first.isSame(currentDate.format('YYYY-MM-DD'), 'day') ? 'current' : first.isSame(this.currentMonth.format('YYYY-MM-DD'), 'month') ? first.isSame(mm().format('YYYY-MM-DD'), 'day') ? 'same-month today' : 'same-month' : 'other-month';
-
-                    days += mu.render(this.options.dayTemplate, {
-                        dayType: dayType,
-                        date: first.format(this.options.format),
-                        day: first.date()
-                    });
-                }
-                return days;
-            }
-        }, {
-            key: 'buildWeekDaysheader',
-            value: function buildWeekDaysheader() {
-                var weekDaysHeader = '';
-                var start = this.options.weekstart; // + mm().localeData().firstDayOfWeek();
-                for (var i = start; i < start + 7; i++) {
-                    var weekday = i;
-                    if (weekday > 6) weekday = weekday - 7;
-                    var weekdayName = mm().day(weekday).format('ddd');
-                    weekDaysHeader += mu.render(this.options.weekdayHeaderTemplate, {
-                        dayType: 'weekday-header',
-                        day: weekdayName
-                    });
-                }
-                return weekDaysHeader;
-            }
-        }, {
-            key: 'buildCalendar',
-            value: function buildCalendar() {
-                this.preventFalseBodyClick = true;
-                this.$dropdown.html('');
-                var date = this.$element.val() == '' ? mm().startOf('date') : mm(this.$element.val(), this.options.format, true);
-                var monthViewModel = {
-                    month: this.currentMonth.format('MMMM YYYY'),
-                    weekdays: this.weekDaysHeader,
-                    days: this.buildCalendarDays(date)
-                };
-
-                var $calendar = $(mu.render(this.options.calendarTemplate, monthViewModel));
-
-                $calendar.on('click', '.months-nav > a', this.navigateMonths.bind(this)).on('click', '.day', this.selectDay.bind(this));
-
-                this.$dropdown.append($calendar);
-            }
-        }, {
             key: 'buildTimePicker',
             value: function buildTimePicker() {
                 this.preventFalseBodyClick = true;
@@ -277,22 +218,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     options: options,
                     timepart: part
                 });
-            }
-        }, {
-            key: 'navigateMonths',
-            value: function navigateMonths(e) {
-                if ($(e.currentTarget).hasClass('month-nav-next')) this.currentMonth.add(1, 'month');
-                if ($(e.currentTarget).hasClass('month-nav-previous')) this.currentMonth.subtract(1, 'month');
-                this.buildCalendar();
-                return false;
-            }
-        }, {
-            key: 'selectDay',
-            value: function selectDay(e) {
-                this.$element.val($(e.currentTarget).data('date'));
-                this.selectedDate = mm($(e.currentTarget).data('date'), this.options.format);
-                this.currentMonth = this.selectedDate.clone().startOf('month');
-                if (this.options.time) this.buildTimePicker();else this.$dropdown.trigger('close');
             }
         }, {
             key: 'addHour',

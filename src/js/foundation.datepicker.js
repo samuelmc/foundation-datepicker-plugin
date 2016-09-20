@@ -152,69 +152,6 @@
             else this._buildCalendar();
         }
 
-        buildCalendarDays(date) {
-            var days = '';
-            var currentDate = mm(date.format('YYYY-MM-DD'));
-            var first = mm(this.currentMonth.format('YYYY-MM-DD'));
-
-            first.startOf('month');
-            var last = first.clone();
-            last.endOf('month');
-
-            first.startOf('week');
-            last.endOf('week');
-
-            for (first; !first.isAfter(last.format('YYYY-MM-DD')); first.add(1, 'day')) {
-                var dayType = first.isSame(
-                    currentDate.format('YYYY-MM-DD'), 'day')
-                    ? 'current'
-                    : (first.isSame(this.currentMonth.format('YYYY-MM-DD'), 'month'))
-                    ? (first.isSame(mm().format('YYYY-MM-DD'), 'day') ? 'same-month today' : 'same-month')
-                    : 'other-month';
-
-                days+= mu.render(this.options.dayTemplate, {
-                    dayType: dayType,
-                    date: first.format(this.options.format),
-                    day: first.date()
-                });
-            }
-            return days;
-        }
-
-        buildWeekDaysheader() {
-            var weekDaysHeader = '';
-            var start = this.options.weekstart;// + mm().localeData().firstDayOfWeek();
-            for (var i = start; i < (start + 7); i++) {
-                var weekday = i;
-                if (weekday > 6) weekday = weekday-7;
-                var weekdayName = mm().day(weekday).format('ddd');
-                weekDaysHeader+= mu.render(this.options.weekdayHeaderTemplate, {
-                    dayType: 'weekday-header',
-                    day: weekdayName
-                });
-            }
-            return weekDaysHeader;
-        }
-
-        buildCalendar() {
-            this.preventFalseBodyClick = true;
-            this.$dropdown.html('');
-            var date = this.$element.val() == '' ? mm().startOf('date') : mm(this.$element.val(), this.options.format, true);
-            var monthViewModel = {
-                month: this.currentMonth.format('MMMM YYYY'),
-                weekdays: this.weekDaysHeader,
-                days: this.buildCalendarDays(date)
-            };
-
-            var $calendar = $(mu.render(this.options.calendarTemplate, monthViewModel));
-
-            $calendar
-                .on('click', '.months-nav > a', this.navigateMonths.bind(this))
-                .on('click', '.day', this.selectDay.bind(this));
-
-            this.$dropdown.append($calendar);
-        }
-
         buildTimePicker() {
             this.preventFalseBodyClick = true;
             this.$dropdown.html('');
@@ -278,21 +215,6 @@
                 options: options,
                 timepart: part
             });
-        }
-
-        navigateMonths(e) {
-            if ($(e.currentTarget).hasClass('month-nav-next')) this.currentMonth.add(1,'month');
-            if ($(e.currentTarget).hasClass('month-nav-previous')) this.currentMonth.subtract(1,'month');
-            this.buildCalendar();
-            return false;
-        }
-
-        selectDay(e) {
-            this.$element.val($(e.currentTarget).data('date'));
-            this.selectedDate = mm($(e.currentTarget).data('date'), this.options.format);
-            this.currentMonth = this.selectedDate.clone().startOf('month');
-            if (this.options.time) this.buildTimePicker();
-            else this.$dropdown.trigger('close');
         }
 
         addHour(e) {
