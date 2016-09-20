@@ -4,9 +4,9 @@
  * foundation.zurb.com
  * Licensed under MIT Open Source
  */
-.datepicker-container {
+.datepicker-dropdown {
   background-color: #fefefe;
-  border: 1px solid #cacaca;
+  border: 1px solid #8a8a8a;
   border-radius: 0;
   display: block;
   font-size: 1rem;
@@ -15,83 +15,82 @@
   visibility: hidden;
   width: 18.75rem;
   z-index: 10; }
-  .datepicker-container.is-open {
+  .datepicker-dropdown.is-open {
     visibility: visible; }
-  .datepicker-container .foundation-calendar {
+  .datepicker-dropdown .datepicker-calendar {
     text-align: center;
-    line-height: 2rem;
+    line-height: 2;
     color: #0a0a0a; }
-    .datepicker-container .foundation-calendar a {
+    .datepicker-dropdown .datepicker-calendar a {
       color: #0a0a0a; }
-    .datepicker-container .foundation-calendar .calendar-header .months-nav > * {
-      display: block; }
-    .datepicker-container .foundation-calendar .calendar-header .months-nav a {
-      position: absolute;
-      top: 0;
-      width: 2rem;
-      margin: .25rem;
-      background: #d8d8d8; }
-      .datepicker-container .foundation-calendar .calendar-header .months-nav a.month-nav-next {
-        right: 0; }
-      .datepicker-container .foundation-calendar .calendar-header .months-nav a i {
+    .datepicker-dropdown .datepicker-calendar nav {
+      padding: .25em 2.5em;
+      position: relative; }
+      .datepicker-dropdown .datepicker-calendar nav a {
         display: block;
-        padding: 0.5625rem 0 0.4375rem; }
-    .datepicker-container .foundation-calendar .calendar-header .months-nav div {
-      margin: .25rem 2.5rem; }
-    .datepicker-container .foundation-calendar .calendar-header .weekdays {
-      padding: 0 0.125rem;
-      background: #ebebeb; }
-    .datepicker-container .foundation-calendar .calendar-header .nav-datepicker {
-      display: block;
-      margin: .25rem;
-      background: #d8d8d8; }
-    .datepicker-container .foundation-calendar .days {
+        position: absolute;
+        width: 2em;
+        top: 0;
+        margin: .25em;
+        background: #d8d8d8;
+        text-align: center;
+        border-radius: 0.125rem; }
+        .datepicker-dropdown .datepicker-calendar nav a:first-child {
+          left: 0; }
+        .datepicker-dropdown .datepicker-calendar nav a:last-child {
+          right: 0; }
+        .datepicker-dropdown .datepicker-calendar nav a i {
+          vertical-align: middle; }
+    .datepicker-dropdown .datepicker-calendar .days, .datepicker-dropdown .datepicker-calendar .weekdays {
       padding: .125rem; }
-      .datepicker-container .foundation-calendar .days div.column {
+      .datepicker-dropdown .datepicker-calendar .days div.column, .datepicker-dropdown .datepicker-calendar .weekdays div.column {
         padding: .125rem; }
-        .datepicker-container .foundation-calendar .days div.column .day {
+        .datepicker-dropdown .datepicker-calendar .days div.column .day, .datepicker-dropdown .datepicker-calendar .weekdays div.column .day {
           line-height: 1.75rem;
           display: block;
           -webkit-transition: background .4s, color .4s;
           transition: background .4s, color .4s;
           padding-top: 0.1875rem; }
-          .datepicker-container .foundation-calendar .days div.column .day.other-month {
+          .datepicker-dropdown .datepicker-calendar .days div.column .day.other-month, .datepicker-dropdown .datepicker-calendar .weekdays div.column .day.other-month {
             color: #ccc;
             background: #ddd;
             cursor: default; }
-            .datepicker-container .foundation-calendar .days div.column .day.other-month:hover {
+            .datepicker-dropdown .datepicker-calendar .days div.column .day.other-month:hover, .datepicker-dropdown .datepicker-calendar .weekdays div.column .day.other-month:hover {
               color: #ccc;
               background: #ddd; }
-          .datepicker-container .foundation-calendar .days div.column .day.same-month {
+          .datepicker-dropdown .datepicker-calendar .days div.column .day.same-month, .datepicker-dropdown .datepicker-calendar .weekdays div.column .day.same-month {
             color: #0a0a0a;
             background: #bbb; }
-            .datepicker-container .foundation-calendar .days div.column .day.same-month.today {
+            .datepicker-dropdown .datepicker-calendar .days div.column .day.same-month.today, .datepicker-dropdown .datepicker-calendar .weekdays div.column .day.same-month.today {
               color: #0a0a0a;
               background: #78b8e8; }
-              .datepicker-container .foundation-calendar .days div.column .day.same-month.today:hover {
+              .datepicker-dropdown .datepicker-calendar .days div.column .day.same-month.today:hover, .datepicker-dropdown .datepicker-calendar .weekdays div.column .day.same-month.today:hover {
                 color: #0a0a0a;
                 background: #2199e8; }
-          .datepicker-container .foundation-calendar .days div.column .day.current, .datepicker-container .foundation-calendar .days div.column .day:hover {
+          .datepicker-dropdown .datepicker-calendar .days div.column .day.current, .datepicker-dropdown .datepicker-calendar .days div.column .day:hover, .datepicker-dropdown .datepicker-calendar .weekdays div.column .day.current, .datepicker-dropdown .datepicker-calendar .weekdays div.column .day:hover {
             color: #0a0a0a;
             background: #2199e8; }
-    .datepicker-container .foundation-calendar .timepicker {
+    .datepicker-dropdown .datepicker-calendar .weekdays .column {
+      font-weight: bold;
+      border-bottom: 1px solid #8a8a8a; }
+    .datepicker-dropdown .datepicker-calendar .timepicker {
       padding: .125rem; }
-      .datepicker-container .foundation-calendar .timepicker .column {
+      .datepicker-dropdown .datepicker-calendar .timepicker .column {
         padding: .125rem; }
-      .datepicker-container .foundation-calendar .timepicker .button {
+      .datepicker-dropdown .datepicker-calendar .timepicker .button {
         margin: 0; }
-      .datepicker-container .foundation-calendar .timepicker .timepart-options-container {
+      .datepicker-dropdown .datepicker-calendar .timepicker .timepart-options-container {
         position: relative;
         height: 2rem;
         overflow: hidden; }
-        .datepicker-container .foundation-calendar .timepicker .timepart-options-container .options {
+        .datepicker-dropdown .datepicker-calendar .timepicker .timepart-options-container .options {
           position: absolute;
           width: 100%;
           bottom: 0; }
-          .datepicker-container .foundation-calendar .timepicker .timepart-options-container .options .time-option {
+          .datepicker-dropdown .datepicker-calendar .timepicker .timepart-options-container .options .time-option {
             line-height: 2rem;
             height: 2rem; }
-    .datepicker-container .foundation-calendar .close-datepicker {
+    .datepicker-dropdown .datepicker-calendar .close-datepicker {
       display: block;
       margin: .25rem;
       background: #d8d8d8; }

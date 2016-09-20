@@ -62,6 +62,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 mm.locale(this.options.locale);
 
                 this.$element.attr({
+                    'id': $id,
                     'data-toggle': $ddId
                 });
 
@@ -72,11 +73,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     'data-close-on-click': this.options.closeOnClick
                 });
                 this.$element.after(this.$dropdown);
+                this.$dropdown.foundation();
 
                 this.$date = this.$element.val() == '' ? mm().startOf('date') : mm(this.$element.val(), this.options.format, true);
-                this.$viewData = this.$date.clone();
+                this.$viewDate = this.$date.clone();
 
-                this.weekDaysHeader = this.buildWeekDaysheader();
+                //this.weekDaysHeader = this.buildWeekDaysheader();
                 this._events();
                 this.currentMonth = mm().startOf('month');
                 this.selectedDate = mm();
@@ -84,7 +86,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: '_buildCalendar',
             value: function _buildCalendar() {
-                var $calandar = $('<div class="datepicker-calendar">'),
+                var $calendar = $('<div class="datepicker-calendar">'),
                     $nav = $('<nav>' + this.$viewDate.format('MMMM YYYY') + '</nav>'),
                     $subtractButton = $('<a data-date-nav="month" data-method="subtract"><i class="fa fa-chevron-left"></i></a>'),
                     $addButton = $('<a data-date-nav="month" data-method="add"><i class="fa fa-chevron-right"></i></a>'),
@@ -93,7 +95,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     $first = mm(this.$viewDate.format('YYYY-MM-DD')),
                     $last = $first.clone();
 
-                $calandar.append($nav);
+                $calendar.append($nav);
                 $nav.prepend($subtractButton).append($addButton);
 
                 $calendar.append($weekdays);
@@ -110,17 +112,52 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 $first.startOf('week');
                 $last.endOf('month');
                 $last.endOf('week');
-                for ($first; !$first.isAfter(last.format('YYYY-MM-DD')); $first.add(1, 'day')) {
+                for ($first; !$first.isAfter($last.format('YYYY-MM-DD')); $first.add(1, 'day')) {
                     var dayType = $first.isSame(this.$date.format('YYYY-MM-DD'), 'day') ? 'current' : $first.isSame(this.$date.format('YYYY-MM-DD'), 'month') ? $first.isSame(mm().format('YYYY-MM-DD'), 'day') ? 'same-month today' : 'same-month' : 'other-month';
 
                     $days.append($('<div class="column"><a class="' + dayType + '" data-set-date="' + $first.format('YYYY-MM-DD') + '">' + $first.date() + '</a></div>'));
                 }
 
+                this.$dropdown.empty();
+                this.$dropdown.append($calendar);
+                $calendar.foundation();
+
+                this.$element.focus();
+
                 this._calendarEvents();
             }
         }, {
             key: '_calendarEvents',
-            value: function _calendarEvents() {}
+            value: function _calendarEvents() {
+                this.$dropdown.find('a[data-date-nav]').off('click').on('click', this._navigateDate.bind(this));
+                this.$dropdown.find('a[data-set-date]').off('click').on('click', this._setDate.bind(this));
+            }
+        }, {
+            key: '_navigateDate',
+            value: function _navigateDate(e) {
+                var $targetData = $(e.currentTarget).data();
+                this.navigateDate($targetData.dateNav, $targetData.method);
+            }
+        }, {
+            key: '_setDate',
+            value: function _setDate(e) {
+                var date = mm($(e.currentTarget).data('set-date'));
+                this.setDate(date.get('year'), date.get('month'), date.get('date'));
+            }
+        }, {
+            key: 'navigateDate',
+            value: function navigateDate(dateNav, method) {
+                this.$viewDate[method](1, dateNav);
+                this._buildCalendar();
+            }
+        }, {
+            key: 'setDate',
+            value: function setDate(year, month, day) {
+                this.$date.set({ 'year': year, 'month': month, 'date': day });
+                this.$element.val(this.$date.format(this.options.format));
+                this.$viewDate = this.$date.clone();
+                if (this.options.closeOnSelect && !this.options.time) this.$dropdown.trigger('close');else if (this.options.time) this._buildCalendar();else this._buildCalendar();
+            }
         }, {
             key: 'buildCalendarDays',
             value: function buildCalendarDays(date) {
@@ -365,7 +402,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function _events() {
                 var _this = this;
 
-                this.$element.add(this.$dropdown).off('keydow.zf.dropdown').on('keydown.zf.datepicker', function (e) {
+                this.$dropdown.on('show.zf.datepicker', this._buildCalendar.bind(this));
+
+                this.$element.add(this.$dropdown).off('keydown.zf.dropdown').on('keydown.zf.datepicker', function (e) {
+
+                    var $target = $(this);
 
                     Foundation.Keyboard.handleKey(e, 'Datepicker', {
                         tab_forward: function tab_forward() {
@@ -377,7 +418,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         open: function open() {
                             if ($target.is(_this.$element)) {
                                 _this.$dropdown.trigger('open');
-                                _this.$dropdown.attr('tabindex', -1).focus();
                                 e.preventDefault();
                             }
                         },
@@ -386,6 +426,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             _this.$element.focus();
                         }
                     });
+                });
+
+                this._triggers();
+            }
+        }, {
+            key: '_triggers',
+            value: function _triggers() {
+                var _this = this;
+                this.$dropdown.on('show.zf.dropdown', function (e) {
+                    console.log('dropdown opening');
+                    _this.$dropdown.trigger('show.zf.datepicker');
                 });
             }
 
@@ -414,6 +465,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
          * @example true
          */
         closeOnClick: true,
+        closeOnSelect: true,
         format: "YYYY-MM-DD",
         locale: 'en',
         weekstart: 0,
