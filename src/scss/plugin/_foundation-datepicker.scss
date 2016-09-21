@@ -45,15 +45,15 @@ $datepicker-width: rem-calc(300) !default;
 
 /// Border radius datepicker panes.
 /// @type Number
-$datepicker-dropdown-radius: $global-radius !default;
+$datepicker-dropdown-radius: $input-radius !default;
 $datepicker-button-radius: rem-calc(2) !default;
 
 /// Sizes for datepicker panes. Each size is a CSS class you can apply.
 /// @type Map
 $datepicker-sizes: (
-        tiny: rem-calc(100),
-        small: rem-calc(200),
-        large: rem-calc(400),
+        tiny: rem-calc(200),
+        small: rem-calc(250),
+        large: rem-calc(375),
 ) !default;
 
 $datepicker-day-out: auto !default;
@@ -72,6 +72,7 @@ $datepicker-day-current: $primary-color !default;
   position: absolute;
   visibility: hidden;
   width: $datepicker-width;
+  max-width: 100%;
   z-index: 10;
 
   &.is-open {
@@ -79,61 +80,12 @@ $datepicker-day-current: $primary-color !default;
   }
 }
 
-@mixin foundation-calendar-header {
-  .months-nav {
-    & > * {
-      display: block;
-    }
-    a {
-      position: absolute;
-      top: 0;
-      width: 2rem;
-      margin: .25rem;
-      @if (lightness($body-background) > 50%) {
-        background: darken($body-background, 15%);
-      }
-      @else {
-        background: lighten($body-background, 15%);
-      }
-      &.month-nav-next {
-        right: 0;
-      }
-      i {
-        display: block;
-        padding: rem-calc(9 0 7);
-      }
-    }
-    div {
-      margin: .25rem 2.5rem;
-    }
-  }
-  .weekdays {
-    padding: rem-calc(0 2);
-    @if (lightness($body-background) > 50%) {
-      background: darken($body-background, 7.5%);
-    }
-    @else {
-      background: lighten($body-background, 7.5%);
-    }
-  }
-  .nav-datepicker {
-    display: block;
-    margin: .25rem;
-    @if (lightness($body-background) > 50%) {
-      background: darken($body-background, 15%);
-    }
-    @else {
-      background: lighten($body-background, 15%);
-    }
-  }
-}
-
 @mixin foundation-calendar-days {
-  padding: .125rem;
+  padding: .125em;
   div.column {
-    padding: .125rem;
+    padding: .125em;
     .day {
-      line-height: 1.75rem;
+      line-height: 1.75em;
       display: block;
       transition: background .4s, color .4s;
       padding-top: rem-calc(3);
@@ -167,24 +119,24 @@ $datepicker-day-current: $primary-color !default;
 }
 
 @mixin foundation-timepicker {
-  padding: .125rem;
+  padding: .125em;
   .column {
-    padding: .125rem;
+    padding: .125em;
   }
   .button {
     margin: 0;
   }
   .timepart-options-container {
     position: relative;
-    height: 2rem;
+    height: 2em;
     overflow: hidden;
     .options {
       position: absolute;
       width: 100%;
       bottom: 0;
       .time-option {
-        line-height: 2rem;
-        height: 2rem;
+        line-height: 2em;
+        height: 2em;
       }
     }
   }
@@ -241,7 +193,7 @@ $datepicker-day-current: $primary-color !default;
   }
   .close-datepicker {
     display: block;
-    margin: .25rem;
+    margin: .25em;
     @if (lightness($body-background) > 50%) {
       background: darken($body-background, 15%);
     }
@@ -252,16 +204,29 @@ $datepicker-day-current: $primary-color !default;
 }
 
 @mixin foundation-datepicker {
-  .datepicker-dropdown {
-    @include datepicker-container;
-    .datepicker-calendar {
-      @include datepicker-calendar;
-    }
-  }
+  .datepicker-wrapper {
+    position: relative;
 
-  @each $name, $size in $datepicker-sizes {
-    .datepicker-pane.#{$name} {
-      width: $size;
+    input[data-datepicker] {
+      &[aria-expanded='true'] {
+        background: $input-background-focus;
+        border: $input-border-focus;
+        box-shadow: $input-shadow-focus;
+      }
+    }
+
+    .datepicker-dropdown {
+      @include datepicker-container;
+      .datepicker-calendar {
+        @include datepicker-calendar;
+      }
+    }
+
+    @each $name, $size in $datepicker-sizes {
+      .datepicker-dropdown.#{$name} {
+        width: $size;
+        font-size: $datepicker-font-size * ($size/$datepicker-width);
+      }
     }
   }
 }

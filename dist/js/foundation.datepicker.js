@@ -53,7 +53,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         _createClass(Datepicker, [{
             key: '_init',
             value: function _init() {
-                var $id = Foundation.GetYoDigits(6, 'datepicker'),
+                var $id = this.$element.attr('id') ? this.$element.attr('id') : Foundation.GetYoDigits(6, 'datepicker'),
                     $ddId = Foundation.GetYoDigits(6, 'datapicker-dropdown');
 
                 mm.updateLocale(this.options.locale, {
@@ -66,21 +66,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     'data-toggle': $ddId
                 });
 
+                if (!this.$element.parent().is('.datepicker-wrapper')) this.$element.wrap($('<div class="datepicker-wrapper">'));
+
                 this.$dropdown = $('<div id="' + $ddId + '" class="datepicker-dropdown" data-dropdown></div>');
                 this.$dropdown.attr({
-                    'data-v-offset': 0,
+                    'data-v-offset': this.options.vOffset,
                     'data-h-offset': 0,
                     'data-close-on-click': this.options.closeOnClick
                 });
+
+                if ($.inArray(this.options.size, ['tiny', 'small', 'large']) > -1) this.$dropdown.addClass(this.options.size);
+
                 this.$element.after(this.$dropdown);
                 this.$dropdown.foundation();
 
                 this.$date = this.$element.val() == '' ? mm().startOf('date') : mm(this.$element.val(), this.options.format, true);
                 this.$viewDate = this.$date.clone();
 
-                //this.weekDaysHeader = this.buildWeekDaysheader();
                 this._events();
-                this.currentMonth = mm().startOf('month');
                 this.selectedDate = mm();
             }
         }, {
@@ -122,8 +125,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.$dropdown.append($calendar);
                 $calendar.foundation();
 
-                this.$element.focus();
-
                 this._calendarEvents();
             }
         }, {
@@ -131,32 +132,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function _calendarEvents() {
                 this.$dropdown.find('a[data-date-nav]').off('click').on('click', this._navigateDate.bind(this));
                 this.$dropdown.find('a[data-set-date]').off('click').on('click', this._setDate.bind(this));
+                if (this.options.closeOnClick) this._overrideBodyHandler();
             }
         }, {
             key: '_navigateDate',
             value: function _navigateDate(e) {
                 var $targetData = $(e.currentTarget).data();
-                this.navigateDate($targetData.dateNav, $targetData.method);
+                this.$viewDate[$targetData.dateNav](1, $targetData.method);
+                this._buildCalendar();
             }
         }, {
             key: '_setDate',
             value: function _setDate(e) {
                 var date = mm($(e.currentTarget).data('set-date'));
-                this.setDate(date.get('year'), date.get('month'), date.get('date'));
-            }
-        }, {
-            key: 'navigateDate',
-            value: function navigateDate(dateNav, method) {
-                this.$viewDate[method](1, dateNav);
-                this._buildCalendar();
-            }
-        }, {
-            key: 'setDate',
-            value: function setDate(year, month, day) {
-                this.$date.set({ 'year': year, 'month': month, 'date': day });
+
+                this.$date.set({ 'year': date.get('year'), 'month': date.get('month'), 'date': date.get('date') });
                 this.$element.val(this.$date.format(this.options.format));
                 this.$viewDate = this.$date.clone();
-                if (this.options.closeOnSelect && !this.options.time) this.$dropdown.trigger('close');else if (this.options.time) this._buildCalendar();else this._buildCalendar();
+                if (this.options.closeOnSelect && !this.options.time) {
+                    this.$dropdown.trigger('close');
+                    this.$element.focus();
+                } else if (this.options.time) this._buildCalendar();else this._buildCalendar();
             }
         }, {
             key: 'buildTimePicker',
@@ -341,7 +337,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             _this.$dropdown.trigger('close');
                         },
                         open: function open() {
-                            if ($target.is(_this.$element)) {
+                            if ($target.is(_this.$element) && _this.$element.attr('aria-expanded') == 'false') {
                                 _this.$dropdown.trigger('open');
                                 e.preventDefault();
                             }
@@ -355,12 +351,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this._triggers();
             }
+
+            /**
+             * Overrides the event handler to the body that closes any dropdowns on a click.
+             * @function
+             * @private
+             */
+
+        }, {
+            key: '_overrideBodyHandler',
+            value: function _overrideBodyHandler() {
+                var $body = $(document.body).not(this.$dropdown),
+                    _this = this;
+                $body.off('click.zf.dropdown').on('click.zf.datepicker', function (e) {
+                    if (_this.$element.is(e.target) || _this.$element.find(e.target).length || !$(document).find(e.target).length) {
+                        return;
+                    }
+                    if (_this.$dropdown.find(e.target).length) {
+                        return;
+                    }
+                    _this.$dropdown.trigger('close');
+                    $body.off('click.zf.datepicker');
+                });
+            }
         }, {
             key: '_triggers',
             value: function _triggers() {
                 var _this = this;
                 this.$dropdown.on('show.zf.dropdown', function (e) {
-                    console.log('dropdown opening');
                     _this.$dropdown.trigger('show.zf.datepicker');
                 });
             }
@@ -385,9 +403,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     Datepicker.defaults = {
         /**
+         * Number of pixels between the datepicker dropdown and the datepicker field on open.
+         * @option
+         * @example 1
+         */
+        vOffset: 10,
+        /**
+         * Size of the datepicker (timy, small or large)
+         * @option
+         * @example 'small'
+         */
+        size: '',
+        /**
          * Allows a click on the body to close the datepicker.
          * @option
-         * @example true
+         * @example false
          */
         closeOnClick: true,
         closeOnSelect: true,
@@ -397,9 +427,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         time: false,
         meridiem: false,
         minuteInterval: 15,
-        calendarTemplate: '<div class="foundation-calendar">' + '<div class="calendar-header">' + '<div class="months-nav">' + '<a class="month-nav-previous"><i class="fa fa-chevron-left fi-arrow-left"></i></a>' + '<div>{{month}}</div>' + '<a class="month-nav-next"><i class="fa fa-chevron-right fi-arrow-right"></i></a>' + '</div>' + '<div class="weekdays row small-up-7 collapse">{{{weekdays}}}</div>' + '</div>' + '<div class="days row small-up-7 collapse">{{{days}}}</div>' + '</div>',
-        weekdayHeaderTemplate: '<div class="column day {{dayType}}"><strong>{{day}}</strong></div>',
-        dayTemplate: '<div class="column"><a class="day {{dayType}}" data-date="{{date}}">{{day}}</a></div>',
         timePickerTemplate: '<div class="foundation-calendar">' + '<div class="calendar-header">' + '<a class="nav-datepicker">{{date}}</a>' + '</div>' + '<div class="timepicker row small-up-{{coll_count}} collapse">{{{timeparts}}}</div>' + '<a class="close-datepicker">Ok</a>' + '</div>',
         timePartSelectorTemplate: '<div class="column {{timepart}}">' + '<a class="button primary expanded {{timepart}}-up"><i class="fa fa-chevron-up fi-arrow-up"></i></a>' + '<div class="timepart-options-container"><div class="options">{{{options}}}</div></div>' + '<a class="button primary expanded {{timepart}}-down disabled"><i class="fa fa-chevron-down fi-arrow-down"></i></a>' + '</div>',
         timeOptionTemplate: '<div class="time-option {{option}}-{{timepart}}">{{option}}</div>'
